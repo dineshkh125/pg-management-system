@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card shadow">
+    <div class="card-header bg-primary text-white">
+        Add New Tenant
+    </div>
+    <div class="card-body">
+        <form method="POST">
+
+            <div class="mb-3">
+                <label class="form-label">Name</label>
+                <input type="text" name="name" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Phone</label>
+                <input type="text" name="phone" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Rent Amount</label>
+                <input type="number" name="rent" class="form-control" required>
+            </div>
+
+            <button type="submit" class="btn btn-success">Add Tenant</button>
+            <a href="/" class="btn btn-secondary">Back</a>
+
+        </form>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between mb-3">
+    <h2>Dashboard</h2>
+    <a href="/add_tenant" class="btn btn-primary">Add Tenant</a>
+</div>
+
+<table class="table table-bordered table-hover bg-white shadow">
+    <thead class="table-dark">
+        <tr>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Rent</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for tenant in tenants %}
+        <tr>
+            <td>{{ tenant.name }}</td>
+            <td>{{ tenant.phone }}</td>
+            <td>₹ {{ tenant.rent }}</td>
+            <td>
+                <a href="/add_payment/{{ tenant.id }}" class="btn btn-sm btn-success">Add Payment</a>
+                <a href="/history/{{ tenant.id }}" class="btn btn-sm btn-info">History</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
