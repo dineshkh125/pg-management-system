@@ -1,11 +1,15 @@
 from flask import Flask, render_template, request, redirect
 import sqlite3
 from datetime import datetime
+import os
 
 app = Flask(__name__)
 
+DATABASE = "database.db"
+
+# ---------------- DATABASE INIT ----------------
 def init_db():
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect(DATABASE)
 
     conn.execute('''
     CREATE TABLE IF NOT EXISTS tenants (
@@ -34,10 +38,17 @@ def init_db():
     conn.close()
 
 
+# ---------------- DB CONNECTION ----------------
 def get_db_connection():
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     return conn
+
+
+# Initialize DB when app starts (Production Safe)
+with app.app_context():
+    init_db()
+
 
 # ---------------- DASHBOARD ----------------
 @app.route('/')
@@ -46,6 +57,7 @@ def dashboard():
     tenants = conn.execute('SELECT * FROM tenants').fetchall()
     conn.close()
     return render_template('dashboard.html', tenants=tenants)
+
 
 # ---------------- ADD TENANT ----------------
 @app.route('/add_tenant', methods=('GET', 'POST'))
@@ -66,6 +78,7 @@ def add_tenant():
         return redirect('/')
 
     return render_template('add_tenant.html')
+
 
 # ---------------- ADD PAYMENT ----------------
 @app.route('/add_payment/<int:tenant_id>', methods=('GET', 'POST'))
@@ -109,12 +122,13 @@ def add_payment(tenant_id):
     conn.close()
     return render_template('add_payment.html', tenant=tenant)
 
+
 # ---------------- MARK PAID ----------------
 @app.route('/mark_paid/<int:payment_id>')
 def mark_paid(payment_id):
     conn = get_db_connection()
 
-    receipt_number = "RCPT" + str(payment_id) + str(datetime.now().strftime("%Y%m%d%H%M%S"))
+    receipt_number = "RCPT" + str(payment_id) + datetime.now().strftime("%Y%m%d%H%M%S")
 
     conn.execute('''
         UPDATE payments
@@ -128,6 +142,7 @@ def mark_paid(payment_id):
     conn.close()
 
     return redirect('/')
+
 
 # ---------------- VIEW HISTORY ----------------
 @app.route('/history/<int:tenant_id>')
@@ -146,8 +161,7 @@ def history(tenant_id):
 
     return render_template('history.html', tenant=tenant, payments=payments)
 
-init_db()
 
-
+# ---------------- RUN APP ----------------
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
