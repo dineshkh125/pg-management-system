@@ -4,6 +4,36 @@ from datetime import datetime
 
 app = Flask(__name__)
 
+def init_db():
+    conn = sqlite3.connect('database.db')
+
+    conn.execute('''
+    CREATE TABLE IF NOT EXISTS tenants (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        phone TEXT,
+        rent INTEGER
+    )
+    ''')
+
+    conn.execute('''
+    CREATE TABLE IF NOT EXISTS payments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        tenant_id INTEGER,
+        amount INTEGER,
+        payment_date TEXT,
+        expected_date TEXT,
+        status TEXT,
+        notes TEXT,
+        receipt_number TEXT,
+        FOREIGN KEY (tenant_id) REFERENCES tenants (id)
+    )
+    ''')
+
+    conn.commit()
+    conn.close()
+
+
 def get_db_connection():
     conn = sqlite3.connect('database.db')
     conn.row_factory = sqlite3.Row
@@ -115,6 +145,9 @@ def history(tenant_id):
     conn.close()
 
     return render_template('history.html', tenant=tenant, payments=payments)
+
+init_db()
+
 
 if __name__ == '__main__':
     app.run(debug=True)
